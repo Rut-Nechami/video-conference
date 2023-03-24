@@ -1,0 +1,5 @@
+<div class="participant">
+    <button (click)="changeMicrophoneMode()"
+        [disabled]="participant.job === 'Judge' || !disableMicrophoneButton? false: true">microphone</button>
+    <div>name:{{participant.job}} {{participant.name}}</div>
+</div>

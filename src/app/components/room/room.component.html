@@ -1,0 +1,5 @@
+<app-participants></app-participants>
+<button (click)="CameraClicked()">Camera</button>
+<button (click)="MicrophoneClicked()">Microphone</button>
+<button>Share</button>
+<button [hidden]="!isJudge" (click)="MuteAllParticipants()">Mute all participants</button>

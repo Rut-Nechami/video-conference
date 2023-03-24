@@ -18,8 +18,13 @@
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
+    "@ngrx/store": "^15.4.0",
+    "dep": "^0.18.3",
+    "ngx-socket-io": "^4.4.0",
     "rxjs": "~7.5.0",
+    "socket.io": "^4.6.1",
     "tslib": "^2.3.0",
+    "uuidv4": "^6.2.13",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
