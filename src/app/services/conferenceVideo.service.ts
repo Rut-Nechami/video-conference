@@ -1,10 +1,12 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { Participant } from '../models/participant';
+import { Participants } from '../models/participants';
 import { map } from 'rxjs';
+import { Permissions } from '../models/permissions';
+import { Users } from '../models/users';
 
-const baseUrl = `${environment.production}/conference-video`;
+const baseUrl = `${environment.production}/caneraAndMicrophone`;
 
 @Injectable({
   providedIn: 'root',
@@ -12,15 +14,28 @@ const baseUrl = `${environment.production}/conference-video`;
 export class ConferenceVideoService {
   constructor(private http: HttpClient) {}
 
-  public addParticipant()
+  public addParticipant(participant: Participants)
   {
     //when a user get in the room, it makes a new HttpPost to put in the details
   }
   public getIfJudgeUser(userId: number) {
     return this.http
-      .get<{ value: Participant }>(`${baseUrl}${userId}`)
+      .get<{ value:Permissions }>(`${baseUrl}${userId}`)
       .pipe(map((res) => res.value));
   }
+
+  public getallParticipants(roomId: number) {
+    return this.http
+      .get<{ value:Participants[] }>(`${baseUrl}${roomId}`)
+      .pipe(map((res) => res.value));
+  }
+
+  public getUserDetails(userId: number) {
+    return this.http
+      .get<{ value:Users }>(`${baseUrl}${userId}`)
+      .pipe(map((res) => res.value));
+  }
+
   changeCameraMode(userId: number,off:boolean) {
     return this.http.patch (
       `${baseUrl}/changeCameraMode`,
@@ -28,17 +43,17 @@ export class ConferenceVideoService {
     );
   }
 
-  changeMicrophoneMode(userId: number, clickerId:number, mute:boolean) {
+  changeMicrophoneMode(userId: number, mute:boolean) {
     return this.http.patch(
       `${baseUrl}/changeMicrophoneMode`,
-      {userId,clickerId,mute}
+      {userId ,mute}
     );
   }
 
-  muteAllParticipants(userIds: number[],clickerId:number ) {
+  muteAllParticipants(userId:number, conferenceId: number) {
     return this.http.patch(
       `${baseUrl}/muteAllParticipants`,
-     {clickerId, userIds}
+     {userId, conferenceId}
     );
   }
 }

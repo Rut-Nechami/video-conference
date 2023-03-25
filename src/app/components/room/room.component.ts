@@ -1,9 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { Jobs } from 'src/app/models/jobs';
-import { Participant } from 'src/app/models/participant';
-import { Room } from 'src/app/models/room';
+import { Jobs, Sides } from 'src/app/models/jobs';
+import { Participants } from 'src/app/models/participants';
 import { ConferenceVideoService } from 'src/app/services/conferenceVideo.service';
 
 @Component({
@@ -15,49 +14,43 @@ import { ConferenceVideoService } from 'src/app/services/conferenceVideo.service
 // so for each user the route is different : room/../user/...
 //this is a room screen of one participant
 export class RoomComponent implements OnInit {
-  public isJudge: Observable<boolean>;
-  public participant: Observable<Participant>;
-  public userId: BehaviorSubject<number>;
-  public room: Room;
+  public participant: Participants;
+  public isJudge: boolean = false;
+
   constructor(
     private router: Router,
     private conferenceVideoService: ConferenceVideoService
-  ) {}
+  ) {
+    this.participant = new Participants(
+      this.router.queryParams['userId'],
+      true,
+      true,
+      Sides.Claimant
+    );
+    //when a user enters the conference he can define which side he is on.
+  }
 
   ngOnInit() {
-    this.participant = this.conferenceVideoService
-      .getIfJudgeUser(this.router.params['userId'])
-      .pipe(
-        map((participant: Participant) => {
-          return participant;
-        })
-      );
-
-    this.isJudge = this.participant.pipe(
-      map((p) => (p.job === Jobs.Judge ? true : false))
-    );
-    //var participants= bring from DB all the participant in this room
-    this.room = new Room(this.participant, participants, true, true);
-    //create a new room details for a specific participant.
-
-    this.userId.next(this.participant.pipe(map((p) => p.userId)));
+    this.conferenceVideoService.addParticipant(this.participant);
+    var participant = this.conferenceVideoService.getIfJudgeUser(this.participant.userId);
+    participant? this.isJudge = true: false;
   }
+
   public CameraClicked() {
     this.conferenceVideoService.changeCameraMode(
-      this.userId.value,
-      !this.room.camera
+      this.participant.userId,
+      !this.participant.isCameraOn
     );
   }
 
   public MicrophoneClicked() {
     this.conferenceVideoService.changeMicrophoneMode(
-      this.userId.value,
-      !this.room.microphone
+      this.participant.userId,
+      !this.participant.isCameraOn
     );
   }
 
   public MuteAllParticipants() {
-    this.conferenceVideoService.muteAllParticipants([1, 2, 3]);
-    //run on all the participants and send their ids
+    this.conferenceVideoService.muteAllParticipants(this.participant.userId, this.router.queryParams['roomId']);
   }
 }
